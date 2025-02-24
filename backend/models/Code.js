@@ -1,8 +1,15 @@
 const mongoose = require("mongoose");
 
 const CodeSchema = new mongoose.Schema({
-  code: { type: String, required: true },
-  createdAt: { type: Date, default: Date.now },
-});
+  codeId: {
+    type: String,
+    unique: true,
+    required: true,
+  },
+  code: {
+    type: String,
+    required: true,
+  },
+}, { timestamps: true });
 
 module.exports = mongoose.model("Code", CodeSchema);
