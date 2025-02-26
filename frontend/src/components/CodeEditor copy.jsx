@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
 const CodeEditor = () => {
-    const { code } = useParams();
+    const { id } = useParams();
     const navigate = useNavigate();
     const [view, setView] = useState("editing");
     const [text, setText] = useState("");
@@ -30,18 +30,54 @@ const CodeEditor = () => {
         return () => document.removeEventListener("keydown", handleKeyDown);
     }, []);
 
+    useEffect(() => {
+        const fetchCode = async () => {
+            try {
+                console.log("Fetching code for ID:", id);
+                const response = await fetch(`http://localhost:5000/api/code/${id}`);
+                console.log("Fetch response:", response);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log("Fetched code:", data);
+                    setText(data.code);
+                } else {
+                    console.error("No existing code found. Status:", response.status);
+                }
+            } catch (error) {
+                console.error("Error fetching code:", error);
+            }
+        };
+        fetchCode();
+    }, [id]);
+    
+
     const handleSaveAndClose = () => {
         console.log("Saved & Closed!");
         navigate("/");
     };
 
-    const handleSave = () => {
-        console.log("Saved!");
+    const handleSave = async () => {
+        try {
+            const response = await fetch(`http://localhost:5000/api/code/${codeId}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ code: text }),
+            });
+
+            if (response.ok) {
+                console.log("Saved successfully!");
+            } else {
+                console.error("Failed to save.");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        }
     };
 
     const handleRefresh = () => {
         setText("");
-        setCharCount(0);
+        setCharCount(value.length);
     };
 
     const handleClose = () => {
@@ -58,7 +94,6 @@ const CodeEditor = () => {
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-gray-900 text-white p-6">
-            {/* Navigation Tabs */}
             <div className="flex space-x-4 mb-4">
                 <button onClick={() => setView("editing")} className={`px-4 py-2 ${view === "editing" ? "bg-blue-600" : "bg-gray-700"} rounded-lg`}>
                     Editing View
@@ -71,7 +106,6 @@ const CodeEditor = () => {
                 </button>
             </div>
 
-            {/* View Content */}
             <div className="w-full max-w-4xl bg-gray-800 p-6 rounded-lg shadow-lg">
                 {view === "editing" && (
                     <textarea 
@@ -83,16 +117,8 @@ const CodeEditor = () => {
                 {view === "reading" && (
                     <p className="text-gray-300">{text || "Reading view for code: " + code}</p>
                 )}
-                {view === "settings" && (
-                    <div className="text-gray-300">
-                        <p><strong>Self Destruct:</strong> Off</p>
-                        <p><strong>Pad Lock:</strong> Off</p>
-                        <p><strong>Line Numbers:</strong> On</p>
-                    </div>
-                )}
             </div>
 
-            {/* Save, Close, Refresh, and Character Count */}
             <div className="mt-4 w-full max-w-4xl bg-blue-700 p-3 flex justify-between items-center rounded-lg">
                 <div className="flex space-x-2">
                     <button onClick={handleSaveAndClose} className="px-4 py-2 bg-gray-300 text-black rounded">Save & Close</button>
@@ -100,7 +126,7 @@ const CodeEditor = () => {
                     <button onClick={handleRefresh} className="px-4 py-2 bg-gray-300 text-black rounded">Refresh</button>
                     <button onClick={handleClose} className="px-4 py-2 bg-gray-300 text-black rounded">Close</button>
                 </div>
-                <span className="text-white">Char count {charCount.toLocaleString()} / {maxCharLimit.toLocaleString()}</span>
+                <span className="text-white">Char count {charCount} / {maxCharLimit}</span>
             </div>
         </div>
     );

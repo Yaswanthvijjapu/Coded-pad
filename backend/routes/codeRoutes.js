@@ -8,17 +8,25 @@ router.post("/", async (req, res) => {
     const { codeId, code } = req.body;
 
     if (!codeId || !code) {
-        return res.status(400).json({ message: "All fields are required" });
+        return res.status(400).json({ message: "codeId and code are required" });
     }
 
     try {
+        let existingCode = await Code.findOne({ codeId });
+
+        if (existingCode) {
+            return res.json({ message: "Code ID already exists", existingCode });
+        }
+
         const newCode = new Code({ codeId, code });
         await newCode.save();
         res.status(201).json({ message: "Code saved successfully", newCode });
     } catch (error) {
+        console.error("Error saving code:", error);
         res.status(500).json({ message: "Server Error", error });
     }
 });
+
 
 // 📌 Update Code
 router.put("/:codeId", async (req, res) => {
@@ -47,10 +55,12 @@ router.put("/:codeId", async (req, res) => {
 // 📌 Get Code by ID
 router.get("/:codeId", async (req, res) => {
     try {
-        const existingCode = await Code.findOne({ codeId: req.params.codeId });
+        let existingCode = await Code.findOne({ codeId: req.params.codeId });
 
         if (!existingCode) {
-            return res.status(404).json({ message: "Code not found" });
+            // If codeId does not exist, create a new entry
+            existingCode = new Code({ codeId: req.params.codeId, code: "" });
+            await existingCode.save();
         }
 
         res.json(existingCode);
@@ -58,5 +68,6 @@ router.get("/:codeId", async (req, res) => {
         res.status(500).json({ message: "Server Error", error });
     }
 });
+
 
 module.exports = router;
