@@ -15,8 +15,8 @@ const Home = () => {
 
     try {
       // Check if codeId exists; if not, create it
-      await axios.get(`http://localhost:5000/api/code/${encodeURIComponent(codeId)}`).catch(async () => {
-        await axios.post("http://localhost:5000/api/code", { codeId, code: "" });
+      await axios.get(`https://coded-pad-production.up.railway.app/api/code/${encodeURIComponent(codeId)}`).catch(async () => {
+        await axios.post("https://coded-pad-production.up.railway.app/api/code", { codeId, code: "" });
       });
       navigate(`/editor/${encodeURIComponent(codeId)}`);
     } catch (error) {
