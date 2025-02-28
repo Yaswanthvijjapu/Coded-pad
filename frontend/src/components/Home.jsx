@@ -8,28 +8,25 @@ const Home = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!codeId.trim()) return;
+    if (!codeId.trim()) {
+      alert("Please enter a Code ID.");
+      return;
+    }
 
     try {
-      // Check if the codeId already exists
-      const response = await axios.get(`http://localhost:5000/api/code/${codeId}`);
-
-      if (!response.data) {
-        // If codeId does not exist, create a new entry in MongoDB
+      // Check if codeId exists; if not, create it
+      await axios.get(`http://localhost:5000/api/code/${encodeURIComponent(codeId)}`).catch(async () => {
         await axios.post("http://localhost:5000/api/code", { codeId, code: "" });
-      }
-
-      // Navigate to Editor page
-      navigate(`/editor/${codeId}`);
+      });
+      navigate(`/editor/${encodeURIComponent(codeId)}`);
     } catch (error) {
-      console.error("Error checking or creating code:", error);
+      console.error("Error checking or creating code:", error.response?.data || error.message);
       alert("Something went wrong. Please try again.");
     }
   };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-r from-gray-900 to-black text-white relative overflow-hidden px-4">
-      {/* Background Random Text Effect */}
       <div className="absolute inset-0 text-gray-500 text-xs md:text-sm leading-6 opacity-10 pointer-events-none">
         {Array(30)
           .fill()
@@ -43,7 +40,6 @@ const Home = () => {
           ))}
       </div>
 
-      {/* Main Content */}
       <div className="relative bg-gray-800 bg-opacity-90 p-6 md:p-10 rounded-xl shadow-2xl text-center w-full max-w-md md:max-w-lg lg:max-w-xl">
         <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-blue-400">
           Enter Your Code ID

@@ -8,7 +8,7 @@ const CodeSchema = new mongoose.Schema({
   },
   code: {
     type: String,
-    required: true,
+    default: "", // Default to empty string if not provided
   },
 }, { timestamps: true });
 
