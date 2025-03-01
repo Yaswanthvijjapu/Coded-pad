@@ -32,7 +32,7 @@ const Editor = () => {
   const handleSave = async () => {
     try {
       const res = await axios.put(`https://coded-pad-production.up.railway.app/api/code/${encodeURIComponent(codeId)}`, { code });
-      setCode(res.data.existingCode.code); // Sync with server response
+      setCode(res.data.existingCode.code); 
       setCharCount(res.data.existingCode.code.length);
       alert("Code saved successfully");
       setReadOnly(true);
