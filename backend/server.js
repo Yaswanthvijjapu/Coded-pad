@@ -7,13 +7,11 @@ const app = express();
 
 // Middleware
 app.use(cors({
-    origin: "https://coded-pad-pied.vercel.app/",
-    methods: ["GET", "POST", "PUT"],
-    allowedHeaders: ["Content-Type"],
-    credentials: true,
-    optionsSuccessStatus: 200,
-}));
-
+    origin: "*", // Allows requests from any domain
+    methods: "GET,POST,PUT,DELETE",
+    credentials: true
+  }));
+  
 app.use(express.json());
 
 // Connect to DB
