@@ -46,10 +46,13 @@ const Editor = () => {
   };
 
   useEffect(() => {
-    if (!editorRef.current) return;
-
+    if (!editorRef.current || loading) return;
+  
+    // Clear previous instance before creating a new one
+    editorRef.current.innerHTML = "";
+  
     const view = new EditorView({
-      doc: code,
+      doc: code,  // Use latest `code`
       extensions: [
         basicSetup,
         languageExtensions[language] || javascript(),
@@ -65,9 +68,9 @@ const Editor = () => {
       ],
       parent: editorRef.current,
     });
-
+  
     return () => view.destroy();
-  }, [language, readOnly]);
+  }, [code, language, readOnly, loading]); 
 
   useEffect(() => {
     const fetchCode = async () => {
@@ -163,5 +166,4 @@ const Editor = () => {
     </div>
   );
 };
-
 export default Editor;
