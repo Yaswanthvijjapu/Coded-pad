@@ -1,4 +1,5 @@
 import { EditorView, basicSetup } from "codemirror";
+import { EditorState } from "@codemirror/state";
 import { autocompletion } from "@codemirror/autocomplete";
 import { javascript } from "@codemirror/lang-javascript";
 import { python } from "@codemirror/lang-python";
@@ -25,8 +26,9 @@ const Editor = () => {
   const [charCount, setCharCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [language, setLanguage] = useState("javascript"); 
+  const [language, setLanguage] = useState("javascript");
   const editorRef = useRef(null);
+  const viewRef = useRef(null);
   const maxCharLimit = 500000;
 
   const languageExtensions = {
@@ -47,12 +49,14 @@ const Editor = () => {
 
   useEffect(() => {
     if (!editorRef.current || loading) return;
-  
-    // Clear previous instance before creating a new one
-    editorRef.current.innerHTML = "";
-  
-    const view = new EditorView({
-      doc: code,  // Use latest `code`
+
+    // Destroy previous instance if exists
+    if (viewRef.current) {
+      viewRef.current.destroy();
+    }
+
+    const state = EditorState.create({
+      doc: code,
       extensions: [
         basicSetup,
         languageExtensions[language] || javascript(),
@@ -66,11 +70,17 @@ const Editor = () => {
         }),
         readOnly ? EditorView.editable.of(false) : EditorView.editable.of(true),
       ],
+    });
+
+    const view = new EditorView({
+      state,
       parent: editorRef.current,
     });
-  
+
+    viewRef.current = view;
+
     return () => view.destroy();
-  }, [code, language, readOnly, loading]); 
+  }, [language, readOnly, loading]); 
 
   useEffect(() => {
     const fetchCode = async () => {
@@ -89,11 +99,10 @@ const Editor = () => {
     fetchCode();
   }, [codeId]);
 
-  
   const handleSave = async () => {
     try {
       const res = await axios.put(`https://coded-pad-production.up.railway.app/api/code/${encodeURIComponent(codeId)}`, { code });
-      setCode(res.data.existingCode.code); 
+      setCode(res.data.existingCode.code);
       setCharCount(res.data.existingCode.code.length);
       alert("Code saved successfully");
       setReadOnly(true);
@@ -148,14 +157,14 @@ const Editor = () => {
       </div>
 
       <div className="w-full max-w-4xl bg-gray-800 p-3 sm:p-4 md:p-6 rounded-lg shadow-lg">
-      <div
-      ref={editorRef}
-      className="w-full min-h-[300px] sm:min-h-[400px] h-[500px] overflow-auto p-4 rounded-lg border border-gray-600 bg-gray-700 text-white"
-    ></div>
+        <div
+          ref={editorRef}
+          className="w-full min-h-[300px] sm:min-h-[400px] h-[500px] overflow-auto p-4 rounded-lg border border-gray-600 bg-gray-700 text-white"
+        ></div>
       </div>
 
       <div className="mt-4 w-full max-w-4xl bg-blue-700 p-3 flex flex-wrap justify-between items-center rounded-lg gap-2">
-      <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2">
           <button onClick={handleSaveAndClose} className="px-4 py-2 bg-gray-300 text-black rounded">Save & Close</button>
           {!readOnly && <button onClick={handleSave} className="px-4 py-2 bg-gray-300 text-black rounded">Save</button>}
           <button onClick={handleRefresh} className="px-4 py-2 bg-gray-300 text-black rounded">Refresh</button>
@@ -166,4 +175,5 @@ const Editor = () => {
     </div>
   );
 };
+
 export default Editor;
