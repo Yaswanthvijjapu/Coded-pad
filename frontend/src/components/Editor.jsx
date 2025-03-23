@@ -14,6 +14,8 @@ import { php } from "@codemirror/lang-php";
 import { rust } from "@codemirror/lang-rust";
 import { sql } from "@codemirror/lang-sql";
 import { go } from "@codemirror/lang-go";
+import { oneDark } from "@codemirror/theme-one-dark";
+import { highlightActiveLine } from "@codemirror/view";
 import { useRef, useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -59,8 +61,10 @@ const Editor = () => {
       doc: code,
       extensions: [
         basicSetup,
+        oneDark, // Dark theme for better readability
         languageExtensions[language] || javascript(),
         autocompletion(),
+        highlightActiveLine(),
         EditorView.updateListener.of((update) => {
           if (update.docChanged) {
             const newCode = update.state.doc.toString();
@@ -80,12 +84,16 @@ const Editor = () => {
     viewRef.current = view;
 
     return () => view.destroy();
-  }, [language, readOnly, loading]); 
+  }, [language, readOnly, loading]);
 
   useEffect(() => {
     const fetchCode = async () => {
       try {
-        const res = await axios.get(`https://coded-pad-production.up.railway.app/api/code/${encodeURIComponent(codeId)}`);
+        const res = await axios.get(
+          `https://coded-pad-production.up.railway.app/api/code/${encodeURIComponent(
+            codeId
+          )}`
+        );
         setCode(res.data.code || "");
         setCharCount(res.data.code ? res.data.code.length : 0);
       } catch (err) {
@@ -101,7 +109,12 @@ const Editor = () => {
 
   const handleSave = async () => {
     try {
-      const res = await axios.put(`https://coded-pad-production.up.railway.app/api/code/${encodeURIComponent(codeId)}`, { code });
+      const res = await axios.put(
+        `https://coded-pad-production.up.railway.app/api/code/${encodeURIComponent(
+          codeId
+        )}`,
+        { code }
+      );
       setCode(res.data.existingCode.code);
       setCharCount(res.data.existingCode.code.length);
       alert("Code saved successfully");
@@ -117,7 +130,10 @@ const Editor = () => {
       await handleSave();
       navigate("/");
     } catch (error) {
-      console.error("Error while saving and closing:", error.response?.data || error.message);
+      console.error(
+        "Error while saving and closing:",
+        error.response?.data || error.message
+      );
       alert("Failed to save and close. Please try again.");
     }
   };
@@ -137,10 +153,20 @@ const Editor = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-900 text-white p-4 md:p-6">
       <div className="flex flex-wrap gap-2 justify-center mb-4 w-full max-w-lg md:max-w-none">
-        <button onClick={() => setReadOnly(false)} className={`px-4 py-2 rounded-lg ${!readOnly ? "bg-blue-600" : "bg-gray-700"}`}>
+        <button
+          onClick={() => setReadOnly(false)}
+          className={`px-4 py-2 rounded-lg ${
+            !readOnly ? "bg-blue-600" : "bg-gray-700"
+          }`}
+        >
           Edit Mode
         </button>
-        <button onClick={() => setReadOnly(true)} className={`px-4 py-2 rounded-lg ${readOnly ? "bg-blue-600" : "bg-gray-700"}`}>
+        <button
+          onClick={() => setReadOnly(true)}
+          className={`px-4 py-2 rounded-lg ${
+            readOnly ? "bg-blue-600" : "bg-gray-700"
+          }`}
+        >
           Read-Only Mode
         </button>
         <select
@@ -165,12 +191,36 @@ const Editor = () => {
 
       <div className="mt-4 w-full max-w-4xl bg-blue-700 p-3 flex flex-wrap justify-between items-center rounded-lg gap-2">
         <div className="flex flex-wrap gap-2">
-          <button onClick={handleSaveAndClose} className="px-4 py-2 bg-gray-300 text-black rounded">Save & Close</button>
-          {!readOnly && <button onClick={handleSave} className="px-4 py-2 bg-gray-300 text-black rounded">Save</button>}
-          <button onClick={handleRefresh} className="px-4 py-2 bg-gray-300 text-black rounded">Refresh</button>
-          <button onClick={handleClose} className="px-4 py-2 bg-gray-300 text-black rounded">Close</button>
+          <button
+            onClick={handleSaveAndClose}
+            className="px-4 py-2 bg-gray-300 text-black rounded"
+          >
+            Save & Close
+          </button>
+          {!readOnly && (
+            <button
+              onClick={handleSave}
+              className="px-4 py-2 bg-gray-300 text-black rounded"
+            >
+              Save
+            </button>
+          )}
+          <button
+            onClick={handleRefresh}
+            className="px-4 py-2 bg-gray-300 text-black rounded"
+          >
+            Refresh
+          </button>
+          <button
+            onClick={handleClose}
+            className="px-4 py-2 bg-gray-300 text-black rounded"
+          >
+            Close
+          </button>
         </div>
-        <span className="text-white text-center text-sm md:text-base">Char count {charCount} / {maxCharLimit}</span>
+        <span className="text-white text-center text-sm md:text-base">
+          Char count {charCount} / {maxCharLimit}
+        </span>
       </div>
     </div>
   );
