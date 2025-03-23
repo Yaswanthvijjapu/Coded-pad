@@ -11,7 +11,6 @@ const Editor = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const maxCharLimit = 500000;
-
   useEffect(() => {
     const fetchCode = async () => {
       try {
