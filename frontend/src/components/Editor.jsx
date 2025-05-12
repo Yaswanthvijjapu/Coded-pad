@@ -90,7 +90,7 @@ const Editor = () => {
     const fetchCode = async () => {
       try {
         const res = await axios.get(
-          `https://coded-pad-production.up.railway.app/api/code/${encodeURIComponent(
+          `https://coded-pad-1.vercel.app/api/code/${encodeURIComponent(
             codeId
           )}`
         );
@@ -110,7 +110,7 @@ const Editor = () => {
   const handleSave = async () => {
     try {
       const res = await axios.put(
-        `https://coded-pad-production.up.railway.app/api/code/${encodeURIComponent(
+        `https://coded-pad-1.vercel.app/api/code/${encodeURIComponent(
           codeId
         )}`,
         { code }

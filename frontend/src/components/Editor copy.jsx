@@ -14,7 +14,7 @@ const Editor = () => {
   useEffect(() => {
     const fetchCode = async () => {
       try {
-        const res = await axios.get(`https://coded-pad-production.up.railway.app/api/code/${encodeURIComponent(codeId)}`);
+        const res = await axios.get(`https://coded-pad-1.vercel.app/api/code/${encodeURIComponent(codeId)}`);
         setCode(res.data.code || "");
         setCharCount(res.data.code ? res.data.code.length : 0);
       } catch (err) {
@@ -30,7 +30,7 @@ const Editor = () => {
 
   const handleSave = async () => {
     try {
-      const res = await axios.put(`https://coded-pad-production.up.railway.app/api/code/${encodeURIComponent(codeId)}`, { code });
+      const res = await axios.put(`https://coded-pad-1.vercel.app/api/code/${encodeURIComponent(codeId)}`, { code });
       setCode(res.data.existingCode.code); 
       setCharCount(res.data.existingCode.code.length);
       alert("Code saved successfully");
