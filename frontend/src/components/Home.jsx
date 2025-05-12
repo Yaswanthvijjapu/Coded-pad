@@ -15,8 +15,8 @@ const Home = () => {
 
     try {
       // Check if codeId exists; if not, create it
-      await axios.get(`https://coded-pad-1.vercel.app/api/code/${encodeURIComponent(codeId)}`).catch(async () => {
-        await axios.post("https://coded-pad-1.vercel.app/api/code", { codeId, code: "" });
+      await axios.get(`https://coded-pad-2myz.vercel.app/api/code/${encodeURIComponent(codeId)}`).catch(async () => {
+        await axios.post("https://coded-pad-2myz.vercel.app/api/code", { codeId, code: "" });
       });
       navigate(`/editor/${encodeURIComponent(codeId)}`);
     } catch (error) {
