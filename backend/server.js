@@ -6,21 +6,13 @@ const connectDB = require("./config/db");
 const app = express();
 
 // Middleware
-const allowedOrigins = [
-  "https://coded-pad-pied.vercel.app", // frontend (production)
-  "http://localhost:5173"              // frontend (development)
-];
-
 app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true,
-  methods: "GET,POST,PUT,DELETE"
+  origin: [
+    "https://coded-pad-pied.vercel.app",
+    "http://localhost:5173" // Add your local development origin
+  ],
+  methods: "GET,POST,PUT,DELETE",
+  credentials: true
 }));
 
   
